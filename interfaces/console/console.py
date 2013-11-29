@@ -27,18 +27,18 @@ class console(thread_template.ThreadTemplate):
 	# Read input from the console
 	def read_input(self):
 		# Wait for input from the keyboard
-		buff						= ''
-		buff_v						= ['']
+		buff = ''
+		buff_v = ['']
 
 		# Loop until we recieve an "exit" string
 		while buff != "exit":
 			# FIXME: Need to fix buff_v
-			buff_v					= ['']
+			buff_v = ['']
 
 			# Make sure we catch EOF exception
 			# FIXME: Need to remove the prompt when in a tty loop (eg.touch tail)
 			try:
-				buff				= raw_input("NXT> ")
+				buff = raw_input("RUN> ")
 			except EOFError:
 				time.sleep(1)
 				continue
@@ -47,7 +47,7 @@ class console(thread_template.ThreadTemplate):
 			if buff == '':
 				continue
 			else:
-				buff_v				= buff.split(' ')
+				buff_v = buff.split(' ')
 
 			## console ########################################################
 			# Send a command to the queue
@@ -61,7 +61,7 @@ class console(thread_template.ThreadTemplate):
 
 			# Close all threads and exit program
 			elif buff_v[0] == 'quit':
-				buff				= 'exit'
+				buff = 'exit'
 				self.s_queues.put('control','quit_sys',{})
 
 			# Return the battery level
@@ -91,7 +91,7 @@ class console(thread_template.ThreadTemplate):
 
 				# List our queues
 				if buff_v[1] == 'list':
-					queue_list		= self.s_queues.queues()
+					queue_list = self.s_queues.queues()
 					for i in queue_list:
 						print i
 
@@ -249,3 +249,4 @@ class console(thread_template.ThreadTemplate):
 
 		print('gps show waypoints		\t\tShow the list of waypoints')
 		print('gps add waypoint			\tAdd a waypoint to the queue')
+

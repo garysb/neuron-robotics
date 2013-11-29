@@ -11,8 +11,8 @@ def to_cartesian(r,a):
 		When given an r,a pair, we return a xcoord and ycoord pair to the method
 		that called it.
 	"""
-	x									= r * cos(a)
-	y									= r * sin(a)
+	x = r * cos(a)
+	y = r * sin(a)
 
 	return x,y
 
@@ -22,14 +22,14 @@ def add(r1,a1,r2,a2):
 		have our two cartesian pairs, we simply add the two x values and the y
 		values, then convert back into polars.
 	"""
-	x1,y1								= to_cartesian(r1,a1)
-	x2,y2								= to_cartesian(r2,a2)
+	x1,y1 = to_cartesian(r1,a1)
+	x2,y2 = to_cartesian(r2,a2)
 
-	x									= x1+x2
-	y									= x2+y2
+	x = x1+x2
+	y = x2+y2
 
-	r									= sqrt( x * x + y * y)
-	a									= atan2(y, x)
+	r = sqrt( x * x + y * y)
+	a = atan2(y, x)
 
 	return r,a
 
@@ -39,14 +39,14 @@ def subtract(r1,a1,r2,a2):
 		cartesian values. Once we've done this, we simply subtract the values
 		from each other and convert back to polar coordinates.
 	"""
-	x1,y1								= to_cartesian(r1,a1)
-	x2,y2								= to_cartesian(r2,a2)
+	x1,y1 = to_cartesian(r1,a1)
+	x2,y2 = to_cartesian(r2,a2)
 
-	x									= x1-x2
-	y									= x2-y2
+	x = x1-x2
+	y = x2-y2
 
-	r									= sqrt( x * x + y * y)
-	a									= atan2(y, x)
+	r = sqrt( x * x + y * y)
+	a = atan2(y, x)
 
 	return r,a
 
@@ -54,7 +54,7 @@ def multiply(r,a,m):
 	""" This function multiplies the location r,a by a factor of m. This is
 		basically scaling the value by a m times.
 	"""
-	r									*= m
+	r *= m
 
 	return r,a
 
@@ -63,6 +63,7 @@ def divide(r,a,d):
 		radius value because the azimuth never changes when doing division and
 		multiplication with polar coordinates.
 	"""
-	r									/= m
+	r /= m
 
 	return r,a
+

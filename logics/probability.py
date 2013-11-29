@@ -12,7 +12,8 @@ def arc(new, old, arc=2.0):
 	"""
 	#FIXME: This doesnt work correctly when using numbers that arnt real
 	if new == 1.0:
-		return												((new-old)/arc)+old
+		return ((new-old)/arc)+old
 
 	if new == 0.0:
-		return												old - (1.0 - old)
+		return old - (1.0 - old)
+

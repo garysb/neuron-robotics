@@ -29,3 +29,4 @@ def setNormal () :
 def readLookAhead () :
 	"read max 3 chars (arrow escape seq) from look ahead"
 	return sys.stdin.read(3)
+

@@ -11,16 +11,16 @@ def to_polar(x,y):
 		When given an x,y pair, we return a radius and an azimuth to the method
 		that called it.
 	"""
-	r									= sqrt( x * x + y * y)
-	a									= atan2(y, x)
+	r = sqrt( x * x + y * y)
+	a = atan2(y, x)
 	return r,a
 
 def add(x1,y1,x2,y2):
 	""" This adds two cartesian coordinates together. Its really as simple as
 		adding the two x values, and the two y values together.
 	"""
-	x									= x1+x2
-	y									= x2+y2
+	x = x1+x2
+	y = x2+y2
 
 	return x,y
 
@@ -30,8 +30,8 @@ def subtract(x1,y1,x2,y2):
 		the new x,y pair. There is also a difference function that calculates
 		the center x,y position in between the two x,y pairs.
 	"""
-	x									= x1-x2
-	y									= y1-y2
+	x = x1-x2
+	y = y1-y2
 	return x,y
 
 def difference(x1,y1,x2,y2):
@@ -39,8 +39,8 @@ def difference(x1,y1,x2,y2):
 		calculates the difference between the two x,y pairs. This lets you find
 		the center point in between the two coordinates.
 	"""
-	x									= (x1+x2)/2
-	y									= (y1+y2)/2
+	x = (x1+x2)/2
+	y = (y1+y2)/2
 
 	return x,y
 
@@ -49,10 +49,10 @@ def multiply(x,y,m):
 		basically scaling the value by a m times. In order to do this, we must
 		first convert into polar coordinates, then convert back into cartesian.
 	"""
-	r,a									= to_polar(x,y)
-	r									*= m
-	x									= r * cos(a)
-	y									= r * sin(a)
+	r,a = to_polar(x,y)
+	r *= m
+	x = r * cos(a)
+	y = r * sin(a)
 
 	return x,y
 
@@ -62,9 +62,10 @@ def divide(x,y,d):
 		divide the radius by the divisor and convert back into our cartesian
 		coordinates to get returned.
 	"""
-	r,a									= to_polar(x,y)
-	r									/= m
-	x									= r * cos(a)
-	y									= r * sin(a)
+	r,a = to_polar(x,y)
+	r /= m
+	x = r * cos(a)
+	y = r * sin(a)
 
 	return x,y
+

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# vim: ts=4 nowrap
+# vim: set ts=8 sw=8 sts=8 list nu:
 
 # Main includes
 import sys
@@ -13,13 +13,13 @@ from connections import sysConnects
 from threads import sysThreads
 
 # Setup threads, connections, conditions, queues, locks, and semophores
-s_conds														= {}
-s_locks														= {}
-s_sema														= {}
+s_conds = {}
+s_locks = {}
+s_sema = {}
 
-s_queues													= sysQueues()
-s_connects													= sysConnects(s_queues, s_conds, s_locks, s_sema)
-s_threads													= sysThreads(s_queues, s_connects, s_conds, s_locks, s_sema)
+s_queues = sysQueues()
+s_connects = sysConnects(s_queues, s_conds, s_locks, s_sema)
+s_threads = sysThreads(s_queues, s_connects, s_conds, s_locks, s_sema)
 
 # Create our main control queue
 s_queues.create('control')
@@ -46,14 +46,14 @@ def parse_queue(block=False, timeout=1):
 			# the function name and arguments to call. The arguments
 			# are placed into the method using a variadic call by
 			# prepending the ** to the beginning of the argument.
-			runner											= s_queues.get('control', block=False, timeout=1)
+			runner = s_queues.get('control', block=False, timeout=1)
 			globals()[runner[1]](**runner[2])
 		except Queue.Empty:
 			# Nothing left to do, time to die
 			return
 
 # Start our console system
-s_locks['con']												= Lock()
+s_locks['con'] = Lock()
 s_threads.create('console')
 
 s_queues.put('console','display',{'message':'control:\t\t\tStarting system'})
@@ -62,3 +62,4 @@ while 1:
 	parse_queue()
 	s_connects.parse_queue()
 	s_threads.parse_queue()
+

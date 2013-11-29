@@ -24,16 +24,16 @@ class sysConnects:
 			of the same type, each entry in the dictionary contains a list.
 			Each entry in the list contains the body socket and connection.
 		"""
-		self.s_queues										= s_queues
-		self.s_conds										= s_conds
-		self.s_locks										= s_locks
-		self.s_sema											= s_sema
+		self.s_queues = s_queues
+		self.s_conds = s_conds
+		self.s_locks = s_locks
+		self.s_sema = s_sema
 
 		self.s_queues.create('connects')
 
 		if os.path.isdir('bodies'):
 			# The bodies directory exists, so now create our connections.
-			self.bodies										= {}
+			self.bodies = {}
 		else:
 			# We dont have the bodies directory. Report an error.
 			# FIXME: We need a standardised way to report errors.
@@ -49,7 +49,7 @@ class sysConnects:
 		"""
 		while True:
 			try:
-				runner										= self.s_queues.get('connects', block=block, timeout=timeout)
+				runner = self.s_queues.get('connects', block=block, timeout=timeout)
 				getattr(self,runner[1])(**runner[2])
 			except Queue.Empty:
 				return
@@ -66,7 +66,7 @@ class sysConnects:
 		if buff == '':
 			return
 		else:
-			buff_v				= buff.split(' ')
+			buff_v = buff.split(' ')
 		if buff_v[0] == 'connects':
 			if not len(buff_v) >= 2:
 				print "Not enough options"
@@ -132,28 +132,28 @@ class sysConnects:
 			# for the directory holding the body details and load all of the
 			# connection data into the modules dictionary.
 			if os.path.isdir("bodies/%s" % body):
-				self.bodies[body]							= {}
-				self.bodies[body]['cons']					= []
-				self.bodies[body]['module']					= {}
+				self.bodies[body] = {}
+				self.bodies[body]['cons'] = []
+				self.bodies[body]['module'] = {}
 
 				# We have the body details, lets load the connection module.
 				# Load the module into a variable.
-				module										= 'bodies.%s.connection' % body
-				fromlist									= []
+				module = 'bodies.%s.connection' % body
+				fromlist = []
 				if string.find(module, '.'):
-					fromlist								= string.split(module, '.')[:-1]
-				self.bodies[body]['module']['connection']	= __import__(module, globals(), locals(), fromlist)
+					fromlist = string.split(module, '.')[:-1]
+				self.bodies[body]['module']['connection'] = __import__(module, globals(), locals(), fromlist)
 
 				# Now that we have made our structure, lets try connect to
 				# the device.
 				if unique:
-					con										= self.bodies[body]['module']['connection'].create(unique)
+					con = self.bodies[body]['module']['connection'].create(unique)
 				else:
-					con										= self.bodies[body]['module']['connection'].create()
+					con = self.bodies[body]['module']['connection'].create()
 				if len(con) > 1:
 					# We got a response, add it to the dictionary
 					self.bodies[body]['cons'].append(con)
-					self.s_locks[body]						= Lock()
+					self.s_locks[body] = Lock()
 				else:
 					# We have a problem, we need to remove the module
 					del self.bodies[body]
@@ -196,3 +196,4 @@ class sysConnects:
 			# We havnt got this body in our connections list. We dont need to
 			# do anything. We should probably report this to the system though.
 			pass
+

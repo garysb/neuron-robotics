@@ -2,7 +2,8 @@
 Genetic Algorithms to evolve variable data.
 """
 
-import Numeric, math, random, time, sys, string
+import math, random, time, sys, string
+#FIXME: Numeric module is no longer maintained: import Numeric, math, random, time, sys, string
 from copy import deepcopy
 
 def display(v):
@@ -204,15 +205,15 @@ class Population:
 			self.verbose = args['verbose']
 		for i in range(cnt):
 			self.individuals.append(geneConstructor(pos = i,
-													popSize = cnt,
-													**args))
+								popSize = cnt,
+								**args))
 	def copy(self):
 		newPop = self.__class__(0, self.geneConstructor, **self.args)
 		newPop.size = self.size
 		for i in range(self.size):
 			newPop.individuals.append( self.individuals[i].copy() )
 		return newPop
-		
+
 	def __getitem__(self, val):
 		return self.individuals[val]
 
@@ -348,7 +349,7 @@ class GA:
 	def applyFitnessFunction(self):
 		for i in range( len(self.pop.individuals) ):
 			self.pop.individuals[i].fitness = self.fitnessFunction(i)
-			
+
 	def setSeed(self, value):
 		self.seed = value
 		random.seed(self.seed)
@@ -388,7 +389,7 @@ class GA:
 		for i in range(self.pop.size):
 			if i not in elitePositions:
 				self.pop.individuals[i] = newpop[i]
-	
+
 	def evolve(self, cont = 0):
 		if not cont:
 			self.generation = 0
@@ -405,12 +406,12 @@ class GA:
 			self.pop.statistics()
 			if self.bestLog != None:
 				self.bestLog.write("%d %5.2f\n" %
-										(self.generation,
-										self.pop.bestMember.fitness))
+					(self.generation,
+					self.pop.bestMember.fitness))
 			if self.averageLog != None:
 				self.averageLog.write("%d %5.2f\n" %
-										(self.generation,
-										self.pop.avgFitness))
+					(self.generation,
+					self.pop.avgFitness))
 			if self.verbose > 1:
 				self.display()
 			if self.isDone():
@@ -542,7 +543,7 @@ if __name__ == '__main__':
 	# Here is a test to evolve the weights/biases in a neural network
 	# that solves the XOR problem:
 
-	from pyrobot.brain.conx import *
+	# from pyrobot.brain.conx import *
 	class NNGA(GA):
 		def __init__(self, cnt):
 			n = Network()
@@ -614,3 +615,4 @@ if __name__ == '__main__':
 					mutationRate=0.06, crossoverRate=0.6, verbose=1,
 					maxGeneration=0)
 		ga.evolve()
+

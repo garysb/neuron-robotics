@@ -17,7 +17,7 @@ class PriorityQueue(Queue.Queue):
 class sysQueues:
 	def __init__(self):
 		# Create a blank dictionary
-		self.queue_dict				= {}
+		self.queue_dict = {}
 
 	# Fetch a list of all our queues
 	def queues(self):
@@ -25,7 +25,7 @@ class sysQueues:
 
 	# Add a queue to the list
 	def create(self, thread):
-		self.queue_dict[thread]		= PriorityQueue(0)
+		self.queue_dict[thread] = PriorityQueue(0)
 
 	# Remove a queue from the list
 	def remove(self, thread):
@@ -66,3 +66,4 @@ class sysQueues:
 	# Put item on queue without waiting
 	def put_nowait(self, thread, function, args='', priority=0):
 		return self.queue_dict[thread].put_nowait((priority, function, args))
+

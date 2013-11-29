@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim: set ts=8 sw=8 sts=8 list nu:
 # My threading template
 
 import threading
@@ -20,7 +21,7 @@ class ThreadTemplate (threading.Thread):
 		self.s_sema											= s_sema
 
 		# Debugging output
-		self.debug											= 25
+		self.debug = 25
 
 	# Parse information sent into the queue
 	def parse_queue(self, block=True, timeout=0.25):
@@ -30,7 +31,7 @@ class ThreadTemplate (threading.Thread):
 			# the function name and arguments to call. The arguments
 			# are placed into the method using a variadic call by
 			# prepending the ** to the beginning of the argument.
-			runner										= self.s_queues.get(self.getName(), block=block, timeout=timeout)
+			runner = self.s_queues.get(self.getName(), block=block, timeout=timeout)
 			getattr(self,runner[1])(**runner[2])
 		except Queue.Empty:
 			# Nothing left to do, time to die
@@ -42,7 +43,7 @@ class ThreadTemplate (threading.Thread):
 
 	# Change our debugging level
 	def set_debug(self, level=0):
-		self.debug											= int(level)
+		self.debug = int(level)
 
 	# Show our debugging level
 	def show_debug(self):
@@ -62,3 +63,4 @@ class ThreadTemplate (threading.Thread):
 
 		# Cant use the exit() call as this invokes string __exit__
 		raise SystemExit
+

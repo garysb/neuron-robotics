@@ -33,14 +33,14 @@ class sysThreads:
 			We also create a threads queue to handle communication with the
 			outside world and our dictionary to hold the modules and threads.
 		"""
-		self.s_queues										= s_queues
-		self.s_connects										= s_connects
-		self.s_conds										= s_conds
-		self.s_locks										= s_locks
-		self.s_sema											= s_sema
+		self.s_queues = s_queues
+		self.s_connects = s_connects
+		self.s_conds = s_conds
+		self.s_locks = s_locks
+		self.s_sema = s_sema
 		self.s_queues.create('threads')
 
-		self.t_dict											= {}
+		self.t_dict = {}
 
 	def parse_queue(self, block=False, timeout=1):
 		""" We run parse_queue in a loop to check if we have any commands to
@@ -52,7 +52,7 @@ class sysThreads:
 		"""
 		while True:
 			try:
-				runner										= self.s_queues.get('threads', block=block, timeout=timeout)
+				runner = self.s_queues.get('threads', block=block, timeout=timeout)
 				getattr(self,runner[1])(**runner[2])
 			except Queue.Empty:
 				return
@@ -69,7 +69,7 @@ class sysThreads:
 		if buff == '':
 			return
 		else:
-			buff_v				= buff.split(' ')
+			buff_v = buff.split(' ')
 		if buff_v[0] == 'threads':
 			if not len(buff_v) >= 2:
 				print "Not enough options"
@@ -117,23 +117,23 @@ class sysThreads:
 		"""
 		try:
 			# Load the module into a variable.
-			fromlist										= []
+			fromlist = []
 			if string.find(module, '.'):
-				fromlist									= string.split(module, '.')
-				t_name										= fromlist.pop()
+				fromlist = string.split(module, '.')
+				t_name = fromlist.pop()
 			if name:
-				t_name										= name
+				t_name = name
 
-			self.t_dict[t_name]								= {}
-			self.t_dict[t_name]['module']					= __import__(module, globals(), locals(), fromlist)
+			self.t_dict[t_name] = {}
+			self.t_dict[t_name]['module'] = __import__(module, globals(), locals(), fromlist)
 
 			# Create the thread and start it
-			self.t_dict[t_name]['thread']					= getattr(self.t_dict[t_name]['module'], t_name)(
-																self.s_queues,
-																self.s_connects,
-																self.s_conds,
-																self.s_locks,
-																self.s_sema)
+			self.t_dict[t_name]['thread'] = getattr(self.t_dict[t_name]['module'], t_name)(
+							self.s_queues,
+							self.s_connects,
+							self.s_conds,
+							self.s_locks,
+							self.s_sema)
 
 			self.t_dict[t_name]['thread'].start()
 		except KeyError:
@@ -163,6 +163,7 @@ class sysThreads:
 			location of the module, we stop the current running thread, then
 			reload the module, then start the new instantiation.
 		"""
-		module												= self.t_dict[name]['module'].__name__
+		module = self.t_dict[name]['module'].__name__
 		self.remove(name)
 		self.create(name, module)
+
