@@ -1,24 +1,9 @@
 # vim: ts=4 nowrap
 import string
 import Queue
-from threading import *
+import threading
 
-# FIXME:We need to be able to handle multiple threads of the same type. Eg.
-#		if we have to nxt bodies, then we could have two ultrasound threads.
-#		These would use different connections and different ports, but still
-#		have the same module loaded. We would of course still be able to set
-#		the local variables seperatly.
-
-# FIXME:We need to validate that the thread have started/stopped correctly.
-#		Due to the way we reload the modules (to allow us to modify live
-#		code), we need to be able to validate the code and then return true
-#		if the thread started properly.
-
-# FIXME:We need a way to return the __doc__ to the caller. This is so that
-#		can issue a command to the nature of 'threads start help' to give
-#		us information on how to start threads.
-
-class sysThreads:
+class threads:
 	""" This object manages our threads. The system works by holding a local
 		dictionary called self.t_dict. When we want to create a new thread, we
 		start by finding the module containing the thread data. Once we find it
@@ -41,6 +26,7 @@ class sysThreads:
 		self.s_queues.create('threads')
 
 		self.t_dict = {}
+		self.name = 'threads'
 
 	def parse_queue(self, block=False, timeout=1):
 		""" We run parse_queue in a loop to check if we have any commands to
@@ -53,11 +39,11 @@ class sysThreads:
 		while True:
 			try:
 				runner = self.s_queues.get('threads', block=block, timeout=timeout)
-				getattr(self,runner[1])(**runner[2])
+				getattr(self, runner[1])(**runner[2])
 			except Queue.Empty:
 				return
 
-	def parse_command(self, buff):
+	def parse_action(self, action):
 		""" When we are running the system, we dont want to be stuck into using
 			one interface type. By executing the commands locally and returning
 			the result to the calling party, we can get around this. Just note
@@ -66,47 +52,21 @@ class sysThreads:
 			queue and not run dirrectly. This is so that our prioritising works
 			properly.
 		"""
-		if buff == '':
-			return
-		else:
-			buff_v = buff.split(' ')
-		if buff_v[0] == 'threads':
-			if not len(buff_v) >= 2:
-				print "Not enough options"
-				return
-			if buff_v[1] == 'remove':
-				self.s_queues.put('threads', 'remove',{'name':buff_v[2]})
-			elif buff_v[1] == 'add':
-				if len(buff_v) == 3:
-					self.s_queues.put('threads','create',{'module':buff_v[2]})
-				elif not len(buff_v) == 4:
-					print "Not enough options", len(buff_v)
-					return
-				else:
-					self.s_queues.put('threads','create',{'name':buff_v[2], 'module':buff_v[3]})
-			elif buff_v[1] == 'reload':
-				self.s_queues.put('threads','recreate',{'name':buff_v[2]})
-			elif buff_v[1] == 'list':
-				print ""
-				for i in enumerate():
-					print i
-			elif buff_v[1] == 'help':
-				self.s_queues.put('threads','parse_help',{})
+		try:
+			if len(action) == 1:
+				action.append('read')
+
+			call = getattr(self, action[1], None)
+
+			if callable(call):
+				values = dict([v.split(':') for v in action[2:]])
+				self.s_queues.put(action[0], action[1], values)
 			else:
-				print 'You havnt invented the "%s" command yet!' % buff_v[1]
+				print "%s action not found in %s" % (action[1], action[0])
+		except:
+			print "error calling %s in %s" % (action[0], action[1])
 
-	def parse_help(self):
-		""" Display help information for using the threads object. These need
-			to be returned as a dictionary of options so we can display them
-			inside other interfaces.
-		"""
-		print('\n## threads #########################################')
-		print('threads list				\tList all threads currently running')
-		print('threads add [thr]		\t\tStart a thread')
-		print('threads remove [thr]		\t\tClose a thread')
-		print('threads restart [thr]	\t\t\tRestart a thread')
-
-	def create(self, name=False, module='interfaces.console.console'):
+	def create(self, id='interface.console.console'):
 		""" due to the nature of our file system layout, we need to be able to
 			specify the location that the threads module is located. to do this
 			we pass in the module layout relative to the root directory of the
@@ -118,17 +78,15 @@ class sysThreads:
 		try:
 			# Load the module into a variable.
 			fromlist = []
-			if string.find(module, '.'):
-				fromlist = string.split(module, '.')
+			if string.find(id, '.'):
+				fromlist = string.split(id, '.')
 				t_name = fromlist.pop()
-			if name:
-				t_name = name
 
 			self.t_dict[t_name] = {}
-			self.t_dict[t_name]['module'] = __import__(module, globals(), locals(), fromlist)
+			self.t_dict[t_name]['module'] = __import__(id, globals(), locals(), fromlist, 0)
 
 			# Create the thread and start it
-			self.t_dict[t_name]['thread'] = getattr(self.t_dict[t_name]['module'], t_name)(
+			self.t_dict[t_name]['thread'] = getattr(self.t_dict[t_name]['module'], t_name) (
 							self.s_queues,
 							self.s_connects,
 							self.s_conds,
@@ -137,25 +95,9 @@ class sysThreads:
 
 			self.t_dict[t_name]['thread'].start()
 		except KeyError:
-			pass
-		except ImportError:
-			print 'Module not found'
+			print 'KeyError %s: %s' % (id, id)
 
-	def remove(self, name):
-		""" When we remove a thread, we first tell the thread to close itself,
-			then we wait for a while and remove the reference in the t_dict
-			dictionary. Once we are sure its gone, we remove the module also.
-		"""
-		self.s_queues.put(name,'close',{})
-		try:
-			while self.t_dict[name]['thread'].isAlive():
-				time.sleep(1)
-		except:
-			pass
-		if self.t_dict.has_key(name):
-			del self.t_dict[name]
-
-	def recreate(self, name):
+	def read(self, id=None):
 		""" When we reload a thread, we need to first retrieve the module
 			location from the already loaded module. We cant just reuse the
 			current module because then any changes we have made wont be copied
@@ -163,7 +105,36 @@ class sysThreads:
 			location of the module, we stop the current running thread, then
 			reload the module, then start the new instantiation.
 		"""
-		module = self.t_dict[name]['module'].__name__
-		self.remove(name)
-		self.create(name, module)
+		if id:
+			print self.t_dict[id]
+		else:
+			for t in threading.enumerate():
+				print t.name
 
+	def update(self, id):
+		""" When we reload a thread, we need to first retrieve the module
+			location from the already loaded module. We cant just reuse the
+			current module because then any changes we have made wont be copied
+			into the new instantiation of the thread. Once we have the name and
+			location of the module, we stop the current running thread, then
+			reload the module, then start the new instantiation.
+		"""
+		try:
+			module = self.t_dict[id]['module'].__name__
+			reload(self.t_dict[id]['module'])
+		except Exception as error:
+			print "Error reloading: %s" % error
+
+	def delete(self, id):
+		""" When we remove a thread, we first tell the thread to close itself,
+			then we wait for a while and remove the reference in the t_dict
+			dictionary. Once we are sure its gone, we remove the module also.
+		"""
+		self.s_queues.put(id,'close',{})
+		try:
+			while self.t_dict[id]['thread'].isAlive():
+				time.sleep(1)
+		except:
+			pass
+		if self.t_dict.has_key(id):
+			del self.t_dict[id]
